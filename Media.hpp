@@ -3,6 +3,8 @@
 #include <cstddef>
 #include <cstdint>
 #include <cassert>
+#include <string>
+#include <functional>
 
 struct TopicPacket {
     int64_t pubTime;
@@ -11,10 +13,16 @@ struct TopicPacket {
     int16_t fragId;
 };
 
+// topic format
+// file://test
+// s5p1|10.10.1.54:50000
+
 template<typename T>
 class Media
 {
 public:
+    using Callback = std::function<void(const T&)>;
+
     Media(const std::string& topic, size_t buffer, bool readOnly)
         : endpoint_(topic)
         , bufferSize_(buffer)
@@ -41,8 +49,8 @@ public:
     // }
     virtual size_t read(T *message, size_t elem) { assert(0); }
 
-    virtual void poll() {}
-   
+    virtual void poll(Callback &&callback) { assert(0); }
+
     virtual void close(bool flush) {}
 protected:
     const std::string endpoint_;

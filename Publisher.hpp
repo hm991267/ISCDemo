@@ -6,6 +6,7 @@
 
 #include "Media.hpp"
 #include "MediaShm.hpp"
+#include "MediaEfvi.hpp"
 
 template <typename T>
 class BasePublisher
@@ -17,8 +18,13 @@ public:
 
     bool publish(const std::string &topic)
     {
+#ifdef USE_EFVI
+        media_ = new MediaEfvi<T>(topic, 1024);
+        return media_->open();
+#else
         media_ = new detail::ShmPub<T>(topic, 1024);
         return media_ != nullptr;
+#endif
     }
 
     size_t write(const T &message) { return media_->write(message); }
